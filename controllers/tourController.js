@@ -1,70 +1,84 @@
 const fs = require('fs');
 
 const tours = JSON.parse(
-    fs.readFileSync(`${__dirname}/../dev-data/data/tours-simple.json`)
-); 
+  fs.readFileSync(`${__dirname}/../dev-data/data/tours-simple.json`)
+);
 
 exports.checkId = (req, res, next, val) => {
-    console.log(`Tour ID is ${val}`);
+  console.log(`Tour ID is ${val}`);
 
-    if(req.params.id * 1 > tours.length){
-        return res.status(404).json({
-            status: 'fail',
-            message: 'Invalid id'
-        })
-    }
-    next();
-}
+  if (req.params.id * 1 > tours.length) {
+    return res.status(404).json({
+      status: 'fail',
+      message: 'Invalid id',
+    });
+  }
+  next();
+};
+
+exports.checkBody = (req, res, next) => {
+  if (!req.body.name || !req.body.price) {
+    return res.status(400).json({
+      status: 'failed',
+      message: 'Missing Name and Price',
+    });
+  }
+  next();
+};
 
 exports.getAllTours = (req, res) => {
-    res.status(200).json({
-        'status': 'success',
-        data: {
-            tours
-        }
-    });
-}
+  res.status(200).json({
+    status: 'success',
+    data: {
+      tours,
+    },
+  });
+};
 
 exports.getTour = (req, res) => {
-    const id = req.params.id * 1;
-    const tour = tours.find(el => el.id === id);
-    
-    res.status(200).json({
-        'status': 'success',
-        data:{
-            tour
-        }
-    })
-}
+  const id = req.params.id * 1;
+  const tour = tours.find((el) => el.id === id);
+
+  res.status(200).json({
+    status: 'success',
+    data: {
+      tour,
+    },
+  });
+};
 
 exports.createTour = (req, res) => {
-    const newId = tours[tours.length - 1].id + 1;
-    const newTour = Object.assign({id: newId},  req.body);
-    
-    tours.push(newTour);
- 
-    fs.writeFile(`${__dirname}/dev-data/data/tours-simple.json`, JSON.stringify(tours), err=>{
-       res.status(201).json({
-         status:"success",
-         data:{
-             tour: newTour
-         }
-       })
-    })
-}
+  const newId = tours[tours.length - 1].id + 1;
+  const newTour = Object.assign({ id: newId }, req.body);
 
-exports.updateTour = (req, res)=>{
-    res.status(200).json({
+  tours.push(newTour);
+
+  fs.writeFile(
+    `${__dirname}/dev-data/data/tours-simple.json`,
+    JSON.stringify(tours),
+    (err) => {
+      res.status(201).json({
         status: 'success',
-        data:{
-            tour: 'Update Tour will be here'
-        }
-    })
-}
+        data: {
+          tour: newTour,
+        },
+      });
+    }
+  );
+};
 
-exports.deleteTour = (req, res)=>{
-    res.status(204).json({
-        status:'success',
-        data: null
-    })
-}
+exports.updateTour = (req, res) => {
+  res.status(200).json({
+    status: 'success',
+    data: {
+      tour: 'Update Tour will be here',
+    },
+  });
+};
+
+exports.deleteTour = (req, res) => {
+  res.status(204).json({
+    status: 'success',
+    data: null,
+  });
+};
