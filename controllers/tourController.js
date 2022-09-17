@@ -49,6 +49,18 @@ exports.getAllTours = async (req, res) => {
       query = query.sort('-createdAtx ');
     }
 
+    // 3. Field Limting
+    if (req.query.fields) {
+      const fields = req.query.fields.split(',').join(' ');
+      query = query.select(fields);
+    } else {
+      /* 
+        - operator for exclude fields from obj
+          usecase:- hide sensitive field in schema like password
+      */
+      query = query.select('-__v');
+    }
+
     // EXeCUTE QUERY
     const tours = await query;
 
